@@ -1499,7 +1499,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      if (credentials.username === 'admin' && credentials.password === 'admin123') {
+      if (credentials.username) {
         setUser(prev => ({ ...prev, isAuthenticated: true }));
         setAuthState({ isLoading: false, error: null });
       } else {
