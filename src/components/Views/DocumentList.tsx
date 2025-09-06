@@ -1,15 +1,35 @@
-import React, { useState } from 'react';
-import { Eye, Star, Clock, Edit, Trash2, Share2, Download, Filter, Search, Plus, Upload, FileText, TrendingUp } from 'lucide-react';
-import { useApp } from '../../contexts/AppContext';
+import React, { useState } from "react";
+import {
+  Eye,
+  Star,
+  Clock,
+  Edit,
+  Trash2,
+  Share2,
+  Download,
+  Filter,
+  Search,
+  Plus,
+  Upload,
+  FileText,
+  TrendingUp,
+} from "lucide-react";
+import { useApp } from "../../contexts/AppContext";
 
 export default function DocumentList() {
-  const { getUserDocuments, setSelectedDocument, user, deleteDocument, setActiveView } = useApp();
-  const [sortBy, setSortBy] = useState('recent');
-  const [filterBy, setFilterBy] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const {
+    getUserDocuments,
+    setSelectedDocument,
+    user,
+    deleteDocument,
+    setActiveView,
+  } = useApp();
+  const [sortBy, setSortBy] = useState("recent");
+  const [filterBy, setFilterBy] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const documentsPerPage = 5;
-  
+
   const userDocuments = getUserDocuments();
 
   const filteredAndSortedDocuments = React.useMemo(() => {
@@ -18,27 +38,31 @@ export default function DocumentList() {
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(doc => 
-        doc.title.toLowerCase().includes(query) ||
-        doc.summary.toLowerCase().includes(query) ||
-        doc.tags.some(tag => tag.toLowerCase().includes(query))
+      filtered = filtered.filter(
+        (doc) =>
+          doc.title.toLowerCase().includes(query) ||
+          doc.summary.toLowerCase().includes(query) ||
+          doc.tags.some((tag) => tag.toLowerCase().includes(query))
       );
     }
 
     // Filter by visibility
-    if (filterBy !== 'all') {
-      filtered = filtered.filter(doc => doc.visibility === filterBy);
+    if (filterBy !== "all") {
+      filtered = filtered.filter((doc) => doc.visibility === filterBy);
     }
 
     // Sort documents
     switch (sortBy) {
-      case 'recent':
-        return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      case 'popular':
+      case "recent":
+        return filtered.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      case "popular":
         return filtered.sort((a, b) => b.views - a.views);
-      case 'rating':
+      case "rating":
         return filtered.sort((a, b) => b.rating - a.rating);
-      case 'title':
+      case "title":
         return filtered.sort((a, b) => a.title.localeCompare(b.title));
       default:
         return filtered;
@@ -51,45 +75,62 @@ export default function DocumentList() {
   }, [sortBy, filterBy, searchQuery]);
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredAndSortedDocuments.length / documentsPerPage);
+  const totalPages = Math.ceil(
+    filteredAndSortedDocuments.length / documentsPerPage
+  );
   const startIndex = (currentPage - 1) * documentsPerPage;
-  const paginatedDocuments = filteredAndSortedDocuments.slice(startIndex, startIndex + documentsPerPage);
+  const paginatedDocuments = filteredAndSortedDocuments.slice(
+    startIndex,
+    startIndex + documentsPerPage
+  );
 
   const formatTimeAgo = (dateString: string) => {
     const now = new Date();
     const date = new Date(dateString);
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return 'Hôm nay';
-    if (diffDays === 1) return 'Hôm qua';
+
+    if (diffDays === 0) return "Hôm nay";
+    if (diffDays === 1) return "Hôm qua";
     return `${diffDays} ngày trước`;
   };
 
   const getVisibilityIcon = (visibility: string) => {
     switch (visibility) {
-      case 'private': return '🔒';
-      case 'group': return '👥';
-      case 'public': return '🌍';
-      default: return '📄';
+      case "private":
+        return "🔒";
+      case "group":
+        return "👥";
+      case "public":
+        return "🌍";
+      default:
+        return "📄";
     }
   };
 
   const getVisibilityColor = (visibility: string) => {
     switch (visibility) {
-      case 'private': return 'from-gray-500 to-slate-600';
-      case 'group': return 'from-blue-500 to-indigo-600';
-      case 'public': return 'from-green-500 to-emerald-600';
-      default: return 'from-gray-500 to-slate-600';
+      case "private":
+        return "from-gray-500 to-slate-600";
+      case "group":
+        return "from-blue-500 to-indigo-600";
+      case "public":
+        return "from-green-500 to-emerald-600";
+      default:
+        return "from-gray-500 to-slate-600";
     }
   };
 
   const getVisibilityLabel = (visibility: string) => {
     switch (visibility) {
-      case 'private': return 'Riêng tư';
-      case 'group': return 'Nhóm';
-      case 'public': return 'Công khai';
-      default: return 'Không xác định';
+      case "private":
+        return "Riêng tư";
+      case "group":
+        return "Nhóm";
+      case "public":
+        return "Công khai";
+      default:
+        return "Không xác định";
     }
   };
 
@@ -98,9 +139,9 @@ export default function DocumentList() {
       <Star
         key={i}
         className={`w-4 h-4 ${
-          i < Math.floor(rating) 
-            ? 'text-yellow-400 fill-current' 
-            : 'text-gray-400'
+          i < Math.floor(rating)
+            ? "text-yellow-400 fill-current"
+            : "text-gray-400"
         }`}
       />
     ));
@@ -113,9 +154,13 @@ export default function DocumentList() {
   };
 
   const totalViews = userDocuments.reduce((sum, doc) => sum + doc.views, 0);
-  const avgRating = userDocuments.length > 0 
-    ? (userDocuments.reduce((sum, doc) => sum + doc.rating, 0) / userDocuments.length).toFixed(1)
-    : '0.0';
+  const avgRating =
+    userDocuments.length > 0
+      ? (
+          userDocuments.reduce((sum, doc) => sum + doc.rating, 0) /
+          userDocuments.length
+        ).toFixed(1)
+      : "0.0";
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
@@ -125,12 +170,14 @@ export default function DocumentList() {
           <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
             <FileText className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Thư viện Tài liệu của Tôi</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Thư viện Tài liệu của Tôi
+          </h1>
           <p className="text-gray-600">Quản lý các đóng góp tri thức của bạn</p>
         </div>
-        
+
         {/* Quick Upload Button */}
-        <div className="mt-8 flex justify-center">
+        {/* <div className="mt-8 flex justify-center">
           <button
             onClick={() => setActiveView('upload')}
             className="inline-flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
@@ -139,7 +186,7 @@ export default function DocumentList() {
             <span>Tải lên Tài liệu Mới</span>
             <Upload className="w-5 h-5" />
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Stats Cards */}
@@ -148,7 +195,9 @@ export default function DocumentList() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm font-medium">Tổng tài liệu</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{userDocuments.length}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">
+                {userDocuments.length}
+              </p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <FileText className="w-6 h-6 text-blue-600" />
@@ -159,7 +208,9 @@ export default function DocumentList() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm font-medium">Tổng lượt xem</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{totalViews.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">
+                {totalViews.toLocaleString()}
+              </p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
               <Eye className="w-6 h-6 text-green-600" />
@@ -170,7 +221,9 @@ export default function DocumentList() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm font-medium">Đánh giá TB</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{avgRating}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">
+                {avgRating}
+              </p>
             </div>
             <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
               <Star className="w-6 h-6 text-yellow-600" />
@@ -239,11 +292,12 @@ export default function DocumentList() {
         {searchQuery && (
           <div className="mt-4 flex items-center space-x-2 text-sm">
             <span className="text-gray-700">
-              Tìm thấy {filteredAndSortedDocuments.length} kết quả cho "{searchQuery}"
+              Tìm thấy {filteredAndSortedDocuments.length} kết quả cho "
+              {searchQuery}"
             </span>
             {filteredAndSortedDocuments.length === 0 && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => setSearchQuery("")}
                 className="text-blue-600 hover:text-blue-700 underline font-medium"
               >
                 Xóa tìm kiếm
@@ -258,20 +312,19 @@ export default function DocumentList() {
         {paginatedDocuments.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl border border-gray-200 shadow-sm">
             <div className="w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-              {searchQuery ? '🔍' : '📄'}
+              {searchQuery ? "🔍" : "📄"}
             </div>
             <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-              {searchQuery ? 'Không tìm thấy tài liệu' : 'Chưa có tài liệu nào'}
+              {searchQuery ? "Không tìm thấy tài liệu" : "Chưa có tài liệu nào"}
             </h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              {searchQuery 
+              {searchQuery
                 ? `Không có kết quả cho "${searchQuery}". Thử từ khóa khác.`
-                : 'Bắt đầu chia sẻ tri thức đầu tiên của bạn với cộng đồng.'
-              }
+                : "Bắt đầu chia sẻ tri thức đầu tiên của bạn với cộng đồng."}
             </p>
             {searchQuery ? (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => setSearchQuery("")}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 Xóa tìm kiếm
@@ -279,12 +332,14 @@ export default function DocumentList() {
             ) : (
               <div className="space-y-6">
                 <button
-                  onClick={() => window.location.hash = '#upload'}
+                  onClick={() => (window.location.hash = "#upload")}
                   className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
                 >
                   🚀 Upload First Document
                 </button>
-                <p className="text-gray-500 text-sm">Hoặc kéo thả file vào đây để tải lên</p>
+                <p className="text-gray-500 text-sm">
+                  Hoặc kéo thả file vào đây để tải lên
+                </p>
               </div>
             )}
           </div>
@@ -297,13 +352,17 @@ export default function DocumentList() {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4 flex-1">
-                    <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${getVisibilityColor(doc.visibility)} flex items-center justify-center text-xl group-hover:scale-110 transition-transform`}>
+                    <div
+                      className={`w-12 h-12 rounded-full bg-gradient-to-r ${getVisibilityColor(
+                        doc.visibility
+                      )} flex items-center justify-center text-xl group-hover:scale-110 transition-transform`}
+                    >
                       {getVisibilityIcon(doc.visibility)}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <h3 
+                          <h3
                             className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors cursor-pointer"
                             onClick={() => setSelectedDocument(doc)}
                           >
@@ -344,9 +403,11 @@ export default function DocumentList() {
                           </button>
                         </div>
                       </div>
-                      
-                      <p className="text-gray-700 text-sm leading-relaxed mb-4">{doc.summary}</p>
-                      
+
+                      <p className="text-gray-700 text-sm leading-relaxed mb-4">
+                        {doc.summary}
+                      </p>
+
                       <div className="flex items-center justify-between">
                         <div className="flex space-x-2">
                           {doc.tags.slice(0, 3).map((tag, index) => (
@@ -358,7 +419,9 @@ export default function DocumentList() {
                             </span>
                           ))}
                           {doc.tags.length > 3 && (
-                            <span className="text-xs text-gray-500">+{doc.tags.length - 3} thêm</span>
+                            <span className="text-xs text-gray-500">
+                              +{doc.tags.length - 3} thêm
+                            </span>
                           )}
                         </div>
                         <div className="flex items-center space-x-4 text-gray-500 text-sm">
@@ -379,40 +442,49 @@ export default function DocumentList() {
             ))}
           </div>
         )}
-        
+
         {/* Pagination */}
         {filteredAndSortedDocuments.length > documentsPerPage && (
           <div className="flex items-center justify-between bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
             <div className="text-sm text-gray-400">
-              Hiển thị {startIndex + 1}-{Math.min(startIndex + documentsPerPage, filteredAndSortedDocuments.length)} trong {filteredAndSortedDocuments.length} tài liệu
+              Hiển thị {startIndex + 1}-
+              {Math.min(
+                startIndex + documentsPerPage,
+                filteredAndSortedDocuments.length
+              )}{" "}
+              trong {filteredAndSortedDocuments.length} tài liệu
             </div>
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
               >
                 Trước
               </button>
-              
+
               <div className="flex space-x-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-2 rounded-lg transition-colors font-medium ${
-                      currentPage === page
-                        ? 'bg-blue-600 text-white shadow-md'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-3 py-2 rounded-lg transition-colors font-medium ${
+                        currentPage === page
+                          ? "bg-blue-600 text-white shadow-md"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
               </div>
-              
+
               <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
               >

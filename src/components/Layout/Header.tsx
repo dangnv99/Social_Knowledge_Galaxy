@@ -27,7 +27,7 @@ export default function Header({ onUploadClick }: HeaderProps) {
     const token = localStorage.getItem("accessToken");
     try {
       if (token) {
-        await fetch("https://b1b58c8a8d8f.ngrok-free.app/auth/logout", {
+        await fetch("https://ced24b621922.ngrok-free.app/auth/logout", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
